@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* =========================
+   Base Theme Variables
+========================= */
+
+:root {
+  --background: 255 255 255;
+  --foreground: 23 23 23;
+  --primary: 2 48 162;
+  --accent: 253 162 54;
+}
+
+/* =========================
+   Tailwind Theme Mapping
+========================= */
+
+@theme inline {
+  --color-background: rgb(var(--background));
+  --color-foreground: rgb(var(--foreground));
+  --color-primary: rgb(var(--primary));
+  --color-accent: rgb(var(--accent));
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* =========================
+   Base Styles
+========================= */
+
+body {
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+}
+
+button {
+  cursor: pointer;
+}

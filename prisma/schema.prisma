@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String   @unique
+  name        String?
+  username    String?  @unique
+  avatar      String?
+  onboarded   Boolean?
+  onboardingStep Int?
+  photos      Photo[]
+  magicLinks  MagicLinkToken[]
+  googleId    String?
+  likes       Like[]
+  saves       Save[]
+  createdAt   DateTime @default(now())
+
+  @@index([googleId])
+}
+
+model Photo {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  imageUrl    String
+  publicId    String?
+  title       String
+  story       String?
+  location    String?
+  tags        String[]
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  height      Int
+  width       Int
+  blurDataURL String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  likeCount   Int?
+  likes       Like[]
+  saves       Save[]
+
+  @@index([createdAt])
+  @@index([userId, createdAt])
+}
+
+model MagicLinkToken {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  photoId   String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photo     Photo    @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, photoId])
+  @@index([photoId])
+}
+
+model Save {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  photoId   String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photo     Photo    @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, photoId])
+  @@index([userId, createdAt])
+}

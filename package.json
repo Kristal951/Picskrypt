@@ -1,0 +1,47 @@
+{
+  "name": "picskrypt",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@emailjs/browser": "^4.4.1",
+    "@emailjs/nodejs": "^5.0.2",
+    "@prisma/client": "6.19",
+    "@upstash/ratelimit": "^2.2.0",
+    "@upstash/redis": "^1.39.0",
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
+    "dotenv": "^17.3.1",
+    "emailjs": "^5.0.0",
+    "google-auth-library": "^11.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^0.574.0",
+    "masonry-css": "^0.0.6",
+    "next": "16.1.6",
+    "pg": "^8.18.0",
+    "prisma": "6.19",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-masonry-css": "^1.0.16",
+    "resend": "^6.30.0",
+    "server-only": "^0.0.1",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20",
+    "@types/pg": "^8.16.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
