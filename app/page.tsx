@@ -52,7 +52,7 @@ const page = () => {
         // scrolled={scrolled}
         // setScrolled={setScrolled}
       />
-      <ThemeToggle/>
+      {/* <ThemeToggle/> */}
     </div>
   );
 };

@@ -6,7 +6,6 @@ import { Sun, Moon } from "lucide-react";
 export default function ThemeToggle() {
   const [dark, setDark] = useState(false);
 
-  // On mount: check saved preference
   useEffect(() => {
     const saved = localStorage.getItem("theme");
     if (saved === "dark") {
@@ -32,7 +31,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="w-10 h-10 rounded-full absolute left-2 bottom-2 bg-foreground/10 hover:bg-foreground/20 transition flex items-center justify-center"
+      className="w-10 h-10 rounded-full fixed left-2 bottom-2 bg-foreground/10 hover:bg-foreground/20 transition flex items-center justify-center"
       aria-label="Toggle Theme"
     >
       {dark ? (

@@ -84,7 +84,7 @@ function TagInput({
     <div>
       <div
         className="
-          flex min-h-[48px] flex-wrap items-center gap-2
+          flex min-h-12 flex-wrap items-center gap-2
           rounded-xl border border-slate-300 bg-white
           px-3 py-2.5
           focus-within:border-indigo-500
