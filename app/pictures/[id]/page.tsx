@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { cache } from "react";
+import { Suspense, cache } from "react";
 import { notFound } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { ogImageUrl } from "@/lib/photo-utils";
 import PhotoDetail from "@/components/ui/PhotoDetail";
 import { Picture } from "@/types/Photo";
+import RelatedPhotos from "@/components/RelatedPhotos";
 
 const OBJECT_ID = /^[a-f\d]{24}$/i;
 
@@ -95,5 +96,18 @@ export default async function PicturePage({
         user: owner,
     };
 
-    return <PhotoDetail initial={initial} />;
+    return (
+        <PhotoDetail
+            initial={initial}
+            related={
+                <Suspense fallback={null}>
+                    <RelatedPhotos
+                        photoId={photo.id}
+                        tags={photo.tags}
+                        location={photo.location}
+                    />
+                </Suspense>
+            }
+        />
+    );
 }

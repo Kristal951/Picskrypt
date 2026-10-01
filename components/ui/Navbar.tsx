@@ -4,7 +4,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Search,
   X,
-  Plus,
   Compass,
   Clock,
   Tag,
@@ -536,7 +535,7 @@ const Navbar = ({
 
                     <div className="py-1">
                       <Link
-                        href="/profile"
+                        href={`/profile/${user.username || user.id}`}
                         role="menuitem"
                         onClick={() => setMenuOpen(false)}
                         className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-800 hover:bg-slate-50 transition-colors"

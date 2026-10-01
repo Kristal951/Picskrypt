@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -40,7 +40,13 @@ const iconBtn =
     "active:scale-95 motion-reduce:transition-none " +
     focusRing;
 
-export default function PhotoDetail({ initial }: { initial: Picture }) {
+export default function PhotoDetail({
+    initial,
+    related,
+}: {
+    initial: Picture;
+    related?: ReactNode;
+}) {
     const router = useRouter();
     const [photo, setPhoto] = useState(initial);
     const [loaded, setLoaded] = useState(false);
@@ -286,6 +292,8 @@ export default function PhotoDetail({ initial }: { initial: Picture }) {
                         ) : null}
                     </aside>
                 </div>
+
+                {related}
             </div>
         </main>
     );
