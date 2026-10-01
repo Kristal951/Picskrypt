@@ -48,9 +48,9 @@ const page = () => {
       />
       <Home
         searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        scrolled={scrolled}
-        setScrolled={setScrolled}
+        // setSearchQuery={setSearchQuery}
+        // scrolled={scrolled}
+        // setScrolled={setScrolled}
       />
       <ThemeToggle/>
     </div>

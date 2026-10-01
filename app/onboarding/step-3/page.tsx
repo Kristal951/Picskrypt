@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Camera, ImagePlus, Sparkles } from "lucide-react";
 import { useUserStore } from "@/store/userStore";
 import { saveOnboardingStep, uploadAvatar } from "@/lib/api";
 import { resizeToSquareJpeg } from "@/lib/image";
@@ -37,14 +38,21 @@ export default function Step3Page() {
             setError("Please choose an image file.");
             return;
         }
+
         if (file.size > MAX_INPUT_BYTES) {
             setError("That image is too large. Choose one under 25MB.");
             return;
         }
 
         setError("");
+
         try {
             const out = await resizeToSquareJpeg(file);
+
+            if (preview) {
+                URL.revokeObjectURL(preview);
+            }
+
             setBlob(out);
             setPreview(URL.createObjectURL(out));
         } catch {
@@ -54,76 +62,133 @@ export default function Step3Page() {
 
     const finish = async () => {
         if (saving) return;
+
         setSaving(true);
         setError("");
 
         try {
             if (blob) await uploadAvatar(blob);
+
             const updated = await saveOnboardingStep({ step: 3 });
             setUser(updated);
             router.replace("/");
         } catch (err: any) {
-            setError(err?.message || "Something went wrong. Please try again.");
+            setError(
+                err?.message || "Something went wrong. Please try again."
+            );
             setSaving(false);
         }
     };
 
+    const hasPhoto = Boolean(blob || user?.avatar);
+
     return (
-        <>
-            <h1 className="text-xl font-bold text-slate-900">Add a profile photo</h1>
-            <p className="mt-1 text-sm text-slate-600">
-                Optional. You can always add one later.
-            </p>
+        <div className="flex min-h-[calc(100vh-120px)] flex-col">
+            <div className="max-w-xl">
+                <div className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-violet-100 text-primary">
+                    <Camera className="h-5 w-5" strokeWidth={2} />
+                </div>
 
-            <div className="mt-6 flex flex-col items-center gap-4">
-                <Avatar
-                    src={preview ?? user?.avatar}
-                    name={user?.name}
-                    username={user?.username}
-                    seed={user?.id}
-                    size={112}
-                />
+                <h1 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+                    Add a profile photo.
+                </h1>
 
-                <input
-                    ref={inputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={onPick}
-                    className="hidden"
-                />
-                <button
-                    type="button"
-                    onClick={() => inputRef.current?.click()}
-                    disabled={saving}
-                    className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition-colors"
-                >
-                    {blob || user?.avatar ? "Choose a different photo" : "Choose a photo"}
-                </button>
+                <p className="mt-3 max-w-md text-[15px] leading-6 text-slate-500">
+                    Give your profile a face. Choose a photo that represents
+                    you — you can always change it later.
+                </p>
+            </div>
+
+            <div className="flex flex-1 items-center justify-center py-10">
+                <div className="flex w-full max-w-md flex-col items-center">
+                    <div className="relative">
+                        <div
+                            className={`rounded-full p-1 transition-all duration-300 ${
+                                preview
+                                    ? "bg-linear-to-br from-primary via-violet-400 to-fuchsia-400"
+                                    : "bg-slate-100"
+                            }`}
+                        >
+                            <div className="rounded-full bg-white p-1">
+                                <Avatar
+                                    src={preview ?? user?.avatar}
+                                    name={user?.name}
+                                    username={user?.username}
+                                    seed={user?.id}
+                                    size={152}
+                                />
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            onClick={() => inputRef.current?.click()}
+                            disabled={saving}
+                            aria-label="Choose profile photo"
+                            className="absolute bottom-1 right-1 flex h-11 w-11 items-center justify-center rounded-full bg-slate-950 text-white shadow-lg ring-4 ring-white transition-all hover:scale-105 hover:bg-primary disabled:pointer-events-none disabled:opacity-60"
+                        >
+                            <Camera className="h-5 w-5" />
+                        </button>
+                    </div>
+
+                    <input
+                        ref={inputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={onPick}
+                        className="hidden"
+                    />
+
+                    <button
+                        type="button"
+                        onClick={() => inputRef.current?.click()}
+                        disabled={saving}
+                        className="mt-6 inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:shadow disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        <ImagePlus className="h-4 w-4" />
+                        {hasPhoto ? "Choose a different photo" : "Choose a photo"}
+                    </button>
+
+                    <p className="mt-3 text-[11px] text-slate-400">
+                        JPG, PNG or WebP · Up to 25MB
+                    </p>
+                </div>
             </div>
 
             {error ? (
-                <p role="alert" className="mt-4 text-sm text-red-600">
+                <div
+                    role="alert"
+                    className="mb-5 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600"
+                >
                     {error}
-                </p>
+                </div>
             ) : null}
 
-            <div className="mt-6 flex gap-3">
+            <div className="mt-auto flex items-center gap-3 border-t border-slate-100 pt-5">
                 <Link
                     href={stepPath(2)}
-                    className="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                    className="inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
                 >
                     Back
                 </Link>
+
                 <button
                     type="button"
                     onClick={finish}
                     disabled={saving}
-                    className="flex-1 rounded-xl bg-indigo-600 px-3 py-2.5 text-sm font-semibold text-white
-                     hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                    className="group flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white transition-all hover:bg-primary disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                    {saving ? "Saving..." : blob ? "Save and finish" : "Skip for now"}
+                    {saving ? (
+                        "Saving..."
+                    ) : hasPhoto ? (
+                        <>
+                            Finish setup
+                        </>
+                    ) : (
+                        "Skip for now"
+                    )}
                 </button>
             </div>
-        </>
+        </div>
     );
 }
