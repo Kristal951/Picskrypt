@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/hooks/useToast";
 import AuthBootstrap from "@/components/AuthBootstrap";
+import CreatePictureButton from "@/components/ui/CreatePictureButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased relative h-screen`}
       >
         <ToastProvider>
           <AuthBootstrap />

@@ -14,11 +14,12 @@ import {
 } from "lucide-react";
 import { usePhotoActions } from "@/hooks/usePhotoActions";
 import { usePictureStore } from "@/store/pictureStore";
-import { formatCount, photoPath } from "@/lib/photo-utils";
+import { photoPath } from "@/lib/photo-utils";
 import { isPlaceholderUsername } from "@/lib/username";
 import cloudinaryLoader from "@/lib/cloudinaryLoader";
 import Avatar from "./Avatar";
 import { Picture } from "@/types/Photo";
+import { useRouter } from "next/navigation";
 
 interface PhotoCardProps {
   photo: Picture;
@@ -31,7 +32,7 @@ const WIDTHS = [320, 480, 640, 800, 1200, 1600];
 const SIZES = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw";
 
 const TOUCH_SHOW =
-  "[@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0";
+  "[@media(hover:none)]:opacity-0 [@media(hover:none)]:translate-y-0";
 
 const PhotoCard: React.FC<PhotoCardProps> = ({
   photo,
@@ -40,6 +41,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
 }) => {
   const patchPicture = usePictureStore((s) => s.patchPicture);
   const removePicture = usePictureStore((s) => s.removePicture);
+  const router = useRouter();
 
   const actions = usePhotoActions(photo, {
     onPatch: (patch) => patchPicture(photo.id, patch),
@@ -97,11 +99,14 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
       u?.username && !isPlaceholderUsername(u.username)
         ? `@${u.username}`
         : u?.name || "";
-    return [handle, photo.location].filter(Boolean).join(" · ") || "Unknown";
-  }, [photo.user, photo.location]);
+    return handle
+  }, [photo.user]);
 
   const stop = (e: React.MouseEvent) => e.stopPropagation();
-  const openCard = () => onOpen?.(photo);
+  const openCard = () => {
+    if (onOpen) onOpen(photo);
+    else router.push(photoPath(photo.id));
+  }
 
   const glass =
     "backdrop-blur-md border transition-all focus:outline-none focus-visible:ring-4 focus-visible:ring-white/20";
@@ -153,14 +158,18 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
         </div>
       </button>
 
-      {/* Top right: like + save */}
       <div
-        className={`absolute top-3 right-3 z-30 flex gap-2
-                    opacity-0 translate-y-2.5
-                    group-hover:opacity-100 group-hover:translate-y-0
-                    focus-within:opacity-100 focus-within:translate-y-0
-                    ${TOUCH_SHOW} transition-all duration-300`}
-      >
+        className="
+          absolute md:top-3 top-1 md:right-3 right-1 z-30
+          flex items-center md:gap-3
+          opacity-0 translate-y-2.5
+          group-hover:opacity-100 group-hover:translate-y-0
+          focus-within:opacity-100 focus-within:translate-y-0
+          [@media(hover:none)]:opacity-100
+          [@media(hover:none)]:translate-y-0
+          transition-all duration-300
+        "
+        >
         <button
           type="button"
           onClick={(e) => {
@@ -170,18 +179,17 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
           aria-pressed={liked}
           aria-label={liked ? "Unlike photo" : "Like photo"}
           title={liked ? "Unlike" : "Like"}
-          className={`${glass} flex items-center gap-1.5 rounded-xl ${likeCount > 0 ? "px-3 py-2.5" : "p-2.5"
-            } ${liked
-              ? "bg-red-500 text-white border-red-400/40 shadow-lg shadow-red-500/20"
-              : glassIdle
-            }`}
+          className="p-1 text-white transition-transform duration-200
+               hover:scale-110 focus:outline-none
+               focus-visible:ring-2 focus-visible:ring-white/60 rounded-full"
         >
-          <Heart className={`w-4 h-4 ${liked ? "fill-current" : ""}`} />
-          {likeCount > 0 ? (
-            <span className="text-xs font-semibold tabular-nums">
-              {formatCount(likeCount)}
-            </span>
-          ) : null}
+          <Heart
+            style={{
+              filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.9))",
+            }}
+            className={`md:h-8 h-6 md:w-8 w-6 transition-colors duration-200 stroke-1 ${liked ? "fill-red-500 text-red-500" : "text-white"
+              }`}
+          />
         </button>
 
         <button
@@ -193,19 +201,24 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
           aria-pressed={saved}
           aria-label={saved ? "Remove from saved" : "Save photo"}
           title={saved ? "Saved" : "Save"}
-          className={`${glass} p-2.5 rounded-xl ${saved
-              ? "bg-indigo-600 text-white border-indigo-500/40 shadow-lg shadow-indigo-500/20"
-              : glassIdle
-            }`}
+          className="p-1 text-white transition-transform duration-200
+               hover:scale-110 focus:outline-none
+               focus-visible:ring-2 focus-visible:ring-white/60 rounded-full"
         >
-          <Bookmark className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
+          <Bookmark
+            style={{
+              filter: "drop-shadow(0 1px 1px rgba(0,0,0,0.9))",
+            }}
+            className={`md:h-8 h-6 md:w-8 w-6 transition-colors duration-200 stroke-1 ${saved ? "fill-blue-500 text-blue-500" : "text-white"
+              }`}
+          />
         </button>
       </div>
 
       <div
         className={`pointer-events-none absolute bottom-0 left-0 right-0 z-20 p-4 transition-all duration-300 ${menuOpen
-            ? "opacity-100 translate-y-0"
-            : `opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0
+          ? "opacity-100 translate-y-0"
+          : `opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0
                focus-within:opacity-100 focus-within:translate-y-0 ${TOUCH_SHOW}`
           }`}
       >
@@ -229,7 +242,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
               </span>
             </div>
 
-            {photo.tags?.length ? (
+            {/* {photo.tags?.length ? (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {photo.tags.slice(0, 3).map((t) => (
                   <span
@@ -246,7 +259,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
                   </span>
                 ) : null}
               </div>
-            ) : null}
+            ) : null} */}
           </div>
 
           <div className="pointer-events-auto flex items-center gap-1 rounded-xl border border-white/15 bg-white/10 backdrop-blur-lg p-1">

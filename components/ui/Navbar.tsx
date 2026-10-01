@@ -105,9 +105,9 @@ const Navbar = ({
 
   const containerClass = useMemo(() => {
     if (!scrolled && !mobileSearchOpen) {
-      return "bg-transparent py-6 border-b border-transparent";
+      return "bg-transparent py-2 border-b border-transparent";
     }
-    return "bg-white/75 backdrop-blur-xl py-3 border-b border-slate-200/60 shadow-[0_2px_24px_-10px_rgba(15,23,42,0.25)]";
+    return "bg-white/75 backdrop-blur-xl py-2 border-b border-slate-200/60 shadow-[0_2px_24px_-10px_rgba(15,23,42,0.25)]";
   }, [scrolled, mobileSearchOpen]);
 
   useEffect(() => {
@@ -466,20 +466,6 @@ const Navbar = ({
               Explore
             </button>
 
-            <Link
-              href="/pictures/create"
-              aria-label="Post photo"
-              className="px-3 md:px-4 py-3 rounded-md text-sm font-bold
-                         bg-indigo-600 text-white
-                         hover:bg-indigo-700 hover:shadow-[0_10px_26px_-10px_rgba(79,70,229,0.6)]
-                         transition-all active:scale-[0.98]
-                         focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/25
-                         flex items-center gap-2"
-            >
-              <Plus className="w-6 h-6 stroke-[3px]" />
-              <span className="hidden sm:inline">Post Photo</span>
-            </Link>
-
             <button
               type="button"
               onClick={() => {
@@ -487,11 +473,11 @@ const Navbar = ({
                 setOpen(false);
                 setActiveIndex(-1);
               }}
-              className={`sm:hidden p-2.5 rounded-2xl transition-all active:scale-[0.98]
+              className={`sm:hidden p-2 rounded-2xl transition-all active:scale-[0.98]
                 ${
                   mobileSearchOpen
                     ? "bg-indigo-50 text-indigo-700"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200/70"
+                    : " text-slate-700 hover:bg-slate-200/70"
                 }
                 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20`}
               aria-label={mobileSearchOpen ? "Close search" : "Open search"}

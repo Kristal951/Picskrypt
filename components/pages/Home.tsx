@@ -1,19 +1,30 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
+import { Masonry } from "masonic";
 import { Camera, Search } from "lucide-react";
 import PhotoCard from "../ui/PhotoCard";
 import Spinner from "../ui/Spinner";
 import GoogleOneTap from "../google/GoogleOneTap";
 import { usePictureStore } from "@/store/pictureStore";
 import { useUserStore } from "@/store/userStore";
-import { Picture } from "@/types/Photo";
+import type { Picture } from "@/types/Photo";
+import CreatePictureButton from "../ui/CreatePictureButton";
 
 type HomeProps = {
   searchQuery: string;
 };
 
+const GUTTER = 16;
+
+// Same breakpoints as before: 2 columns, 3 from md, 4 from xl
 function useColumnCount() {
   const [count, setCount] = useState(2);
 
@@ -34,23 +45,16 @@ function useColumnCount() {
   return count;
 }
 
-function buildColumns(photos: Picture[], count: number): Picture[][] {
-  const cols: Picture[][] = Array.from({ length: count }, () => []);
-  const heights = new Array<number>(count).fill(0);
+const MasonryCard = ({
+  data,
+  index,
+}: {
+  data: Picture;
+  index: number;
+  width: number;
+}) => <PhotoCard photo={data} priority={index < 4} />;
 
-  for (const p of photos) {
-    const w = p.width > 0 ? p.width : 1200;
-    const h = p.height > 0 ? p.height : 900;
-
-    let target = 0;
-    for (let i = 1; i < count; i++) {
-      if (heights[i] < heights[target]) target = i;
-    }
-    cols[target].push(p);
-    heights[target] += h / w;
-  }
-  return cols;
-}
+const itemKey = (data: Picture) => data.id;
 
 const Home = ({ searchQuery }: HomeProps) => {
   const pictures = usePictureStore((s) => s.pictures);
@@ -64,12 +68,17 @@ const Home = ({ searchQuery }: HomeProps) => {
   const userId = useUserStore((s) => s.user?.id ?? null);
 
   const [fetched, setFetched] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const columnCount = useColumnCount();
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     fetchPictures()
-      .catch(() => { }) 
+      .catch(() => { })
       .finally(() => setFetched(true));
   }, [fetchPictures, userId]);
 
@@ -109,22 +118,25 @@ const Home = ({ searchQuery }: HomeProps) => {
     });
   }, [searchQuery, pictures]);
 
-  const columns = useMemo(
-    () => buildColumns(filteredPhotos, columnCount),
-    [filteredPhotos, columnCount],
-  );
+  const prevIdsRef = useRef<string[]>([]);
+  const [layoutVersion, setLayoutVersion] = useState(0);
 
-  const topRow = useMemo(
-    () => new Set(filteredPhotos.slice(0, columnCount).map((p) => p.id)),
-    [filteredPhotos, columnCount],
-  );
+  useLayoutEffect(() => {
+    const prev = prevIdsRef.current;
+    const next = filteredPhotos.map((p) => p.id);
+    const isAppend =
+      prev.length <= next.length && prev.every((id, i) => id === next[i]);
+
+    prevIdsRef.current = next;
+    if (!isAppend) setLayoutVersion((v) => v + 1);
+  }, [filteredPhotos]);
 
   const noPhotosYet = pictures.length === 0;
   const searching = searchQuery.trim().length > 0;
 
   return (
-    <div className="min-h-screen w-full bg-[#fcfcfc] text-slate-900">
-      <main className="w-full mx-auto px-6 pt-20 pb-20">
+    <div className="min-h-screen w-full bg-[#fcfcfc] text-slate-900 relative">
+      <main className="w-full mx-auto px-4 pt-20 pb-20">
         {searching ? (
           <header className="mb-12 mt-4">
             <h1 className="text-4xl font-extrabold tracking-tight mb-2">
@@ -175,19 +187,19 @@ const Home = ({ searchQuery }: HomeProps) => {
             </Link>
           </div>
         ) : filteredPhotos.length > 0 ? (
-          <div className="flex items-start gap-4">
-            {columns.map((col, i) => (
-              <div key={i} className="flex min-w-0 flex-1 flex-col gap-4">
-                {col.map((photo) => (
-                  <PhotoCard
-                    key={photo.id}
-                    photo={photo}
-                    priority={topRow.has(photo.id)}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
+          mounted ? (
+            <Masonry
+              key={layoutVersion}
+              items={filteredPhotos}
+              render={MasonryCard}
+              itemKey={itemKey}
+              columnCount={columnCount}
+              columnGutter={GUTTER}
+              rowGutter={GUTTER}
+              itemHeightEstimate={320}
+              overscanBy={3}
+            />
+          ) : null
         ) : hasMore ? (
           <div className="py-20 text-center text-slate-500">
             Searching more photos&hellip;
@@ -235,6 +247,7 @@ const Home = ({ searchQuery }: HomeProps) => {
       </main>
 
       <GoogleOneTap />
+      <CreatePictureButton />
     </div>
   );
 };

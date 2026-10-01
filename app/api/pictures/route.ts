@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getSession } from "@/lib/session";
 
 const PAGE_SIZE = 24;
 const OBJECT_ID = /^[a-f\d]{24}$/i;
@@ -17,19 +18,43 @@ export async function GET(req: NextRequest) {
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     });
 
+    const session = await getSession().catch(() => null);
     const hasMore = rows.length > PAGE_SIZE;
     const page = hasMore ? rows.slice(0, PAGE_SIZE) : rows;
-
     const userIds = [...new Set(page.map((p) => p.userId))];
-    const users = userIds.length
-      ? await prisma.user.findMany({
-          where: { id: { in: userIds } },
-          select: { id: true, name: true, username: true, avatar: true },
-        })
-      : [];
+    const ids = page.map((p) => p.id);
+
+    const [users, likes, saves] = await Promise.all([
+      userIds.length
+        ? prisma.user.findMany({
+            where: { id: { in: userIds } },
+            select: { id: true, name: true, username: true, avatar: true },
+          })
+        : Promise.resolve([]),
+      session && ids.length
+        ? prisma.like.findMany({
+            where: { userId: session.userId, photoId: { in: ids } },
+            select: { photoId: true },
+          })
+        : Promise.resolve([]),
+      session && ids.length
+        ? prisma.save.findMany({
+            where: { userId: session.userId, photoId: { in: ids } },
+            select: { photoId: true },
+          })
+        : Promise.resolve([]),
+    ]);
+
+    const liked = new Set(likes.map((l) => l.photoId));
+    const saved = new Set(saves.map((s) => s.photoId));
     const byId = new Map(users.map((u) => [u.id, u]));
 
-    const items = page.map((p) => ({ ...p, user: byId.get(p.userId) ?? null }));
+    const items = page.map((p) => ({
+      ...p,
+      likedByMe: liked.has(p.id),
+      savedByMe: saved.has(p.id),
+      user: byId.get(p.userId) ?? null,
+    }));
 
     return NextResponse.json({
       items,

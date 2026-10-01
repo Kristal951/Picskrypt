@@ -23,6 +23,7 @@
     "google-auth-library": "^11.1.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.574.0",
+    "masonic": "^4.1.0",
     "masonry-css": "^0.0.6",
     "next": "16.1.6",
     "pg": "^8.18.0",
