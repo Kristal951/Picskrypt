@@ -12,12 +12,18 @@ import {
   LogOut,
   User as UserIcon,
 } from "lucide-react";
-import Image from "next/image";
+import { Poppins } from "next/font/google";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/userStore";
 import { isPlaceholderUsername } from "@/lib/username";
 import Avatar from "./Avatar";
+
+const brand = Poppins({
+  subsets: ["latin"],
+  weight: "600",
+  display: "swap",
+});
 
 interface NavbarProps {
   searchQuery: string;
@@ -196,7 +202,7 @@ const Navbar = ({
     commitRecent(value);
     setOpen(false);
     setActiveIndex(-1);
-    if (mode === "mobile") mobileInputRef.current?.blur(); 
+    if (mode === "mobile") mobileInputRef.current?.blur();
   };
 
   const onLogout = async () => {
@@ -427,25 +433,33 @@ const Navbar = ({
           <div className="flex items-center shrink-0">
             <Link
               href="/"
-              className="relative group active:scale-[0.98] transition-transform focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20 rounded-2xl"
+              className="flex items-center rounded-2xl active:scale-[0.98] transition-transform focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500/20"
               onClick={() => {
                 setSearchQuery("");
                 setMobileSearchOpen(false);
                 setOpen(false);
                 setActiveIndex(-1);
               }}
-              aria-label="Go home"
+              aria-label="Picskrypt, go home"
             >
-              <div className="relative w-32 h-8 md:w-40 md:h-10">
-                <Image
-                  src="/assets/PicsKrypt_2.png"
-                  alt="PicsKrypt"
-                  fill
-                  priority
-                  className="object-contain"
-                  sizes="(max-width: 768px) 128px, 160px"
-                />
-              </div>
+              <img
+                src="/assets/mark.svg"
+                alt=""
+                width={188}
+                height={196}
+                className="h-9 w-auto md:h-10"
+              />
+
+              <span
+                aria-hidden="true"
+                className={`${brand.className} block select-none text-[23.5px] font-semibold leading-none tracking-[-0.012em] text-stone-900 md:text-[26px]`}
+              >
+                <span className="relative inline-block">
+                  ı
+                  <span className="absolute left-[0.14em] top-[0.058em] h-[0.182em] w-[0.182em] -translate-x-1/2 rounded-full bg-amber-400" />
+                </span>
+                cskrypt
+              </span>
             </Link>
           </div>
 
@@ -454,8 +468,8 @@ const Navbar = ({
           </div>
 
           <div className="flex items-center gap-2 md:gap-3 shrink-0">
-            <button
-              type="button"
+            <Link
+              href="/explore"
               className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold
                          text-slate-600 hover:text-indigo-600 hover:bg-indigo-50
                          transition-all active:scale-[0.98]
@@ -463,7 +477,7 @@ const Navbar = ({
             >
               <Compass className="w-4 h-4" />
               Explore
-            </button>
+            </Link>
 
             <button
               type="button"

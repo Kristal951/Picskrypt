@@ -516,7 +516,7 @@ const UploadPicture = () => {
     !submitting;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="h-screen bg-slate-50 relative w-full flex flex-col items-center justify-center text-slate-900">
       <canvas
         ref={canvasRef}
         className="hidden"
@@ -540,7 +540,7 @@ const UploadPicture = () => {
         }}
       />
 
-      <header className="">
+      <header className="absolute right-0 top-2">
         <div
           className="
             mx-auto flex py-2 w-full max-w-6xl
@@ -683,7 +683,7 @@ const UploadPicture = () => {
                   className="
                     mt-7 flex w-full
                     max-w-sm flex-col gap-3
-                    sm:flex-row sm:max-w-none
+                    sm:flex-row sm:max-w-none items-center justify-center
                   "
                 >
                   <button

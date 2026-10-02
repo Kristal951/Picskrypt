@@ -69,7 +69,6 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
 
   const liked = !!photo.likedByMe;
   const saved = !!photo.savedByMe;
-  const likeCount = photo.likeCount ?? 0;
 
   const safeWidth = photo.width && photo.width > 0 ? photo.width : 1200;
   const safeHeight = photo.height && photo.height > 0 ? photo.height : 900;

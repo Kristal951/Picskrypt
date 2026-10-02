@@ -53,7 +53,7 @@ export default function PhotoGrid({
                 return (
                     <li
                         key={photo.id}
-                        className="mb-3 break-inside-avoid sm:mb-4"
+                        className="mb-3 break-inside-avoid sm:mb-4 shadow-sm"
                     >
                         <Link
                             href={`/pictures/${photo.id}`}

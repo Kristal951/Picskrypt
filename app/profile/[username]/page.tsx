@@ -70,13 +70,15 @@ export default async function ProfilePage({ params }: Props) {
 
                 <div className="mt-8 flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-14">
                     <header className="flex items-center gap-5 lg:sticky lg:top-8 lg:w-72 lg:shrink-0 lg:flex-col lg:items-start lg:gap-6">
-                        <Avatar
-                            src={user.avatar}
-                            name={user.name}
-                            username={user.username}
-                            seed={user.id}
-                            size={112}
-                        />
+                        <div className="w-max h-max rounded-full ring-1 ring-stone-200 lg:shrink-0">
+                            <Avatar
+                                src={user.avatar}
+                                name={user.name}
+                                username={user.username}
+                                seed={user.id}
+                                size={112}
+                            />
+                        </div>
 
                         <div className="min-w-0">
                             <h1 className="font-serif text-3xl font-semibold leading-tight tracking-tight text-stone-900 sm:text-4xl">
